@@ -15,91 +15,96 @@ function getComputerChoice() {
     }
 }
 
+let won = 0;
+let lost = 0;
+
 function playRound(playerSelection, computerSelection) {
     let pS = playerSelection.slice(0, 1).toUpperCase() +playerSelection.slice(1).toLowerCase();
-    let cS = computerSelection.slice(0, 1).toUpperCase() +computerSelection.slice(1).toLowerCase();
+    let cS = computerSelection.slice(0, 1).toUpperCase() +computerSelection.slice(1).toLowerCase();    
+
+    let final = "";
 
     if (pS === cS) {
-        return "It's a tie!";
+        final = "It's a tie!";
     } 
 
     switch (pS) {
         case "Rock":
             if (cS === "Paper") {
-                return "You Lose! Paper beats Rock";        
+                final =  "You Lost! Paper beats Rock";        
             } else {
-                return "You Won! Rock beats Scissors";
+                final = "You Won! Rock beats Scissors";
             }
             break;
         case "Paper":
             if (cS === "Scissors") {
-                return "You Lose! Scissors beats Paper";        
+                final = "You Lost! Scissors beats Paper";        
             } else {
-                return "You Won! Paper beats Rock";
+                final = "You Won! Paper beats Rock";
             }
             break;
         case "Scissors":
             if (cS === "Rock") {
-                return "You Lose! Rock beats Scissors";
+                final = "You Lost! Rock beats Scissors";
             } else {
-                return "You Won! Scissors beats Paper";
+                final = "You Won! Scissors beats Paper";
             }
             break;
         default:
             return "Wrong input!";
     }
-}
 
-function game() {
-    let userInput;
-    let result;
-    let winCount = 0;
-    let lossCount = 0;
-    let resultText;
-
-    for (let i=0; i < 5; i++) {
-        userInput = prompt("Rock ? Paper ? Or Scissors ?");
-        result = playRound(userInput, getComputerChoice());
-
-        console.log(result);
-        alert(result);
-
-        if (result.slice(0, 7) === "You Won") {
-            winCount++;
-        }
-
-        if (result.slice(0, 8) === "You Lose") {
-            lossCount++;
-        }
+    if (/won/i.test(final)) won += 1;  
+    if (/lost/i.test(final)) lost += 1;
+    if (won === 5) {
+        resetGame();
+        return "Congrats! You won the game.";
     }
-
-    resultText = `Result : You => ${winCount} | Computer => ${lossCount}`;
-    console.log(resultText);
-    alert(resultText);
-    
-    if (winCount > lossCount) {
-        console.log("You Won the game");
-        alert("YOU WON !!! CONGRATULATIONS!!!");
-    } else if (winCount < lossCount) {
-        console.log("You Lost the game");
-        alert("YOU LOST! Good luck next time!");
-    } else {
-        console.log("It is a tie, no one wins!");
-        alert("It's a TIE!!! Good luck next time.")
+    if (lost === 5) {
+        resetGame();
+        return "Sorry ! You lost the game.";
     }
+    return final;
 }
 
-window.onload=function(){
-    const play = document.querySelector(".playButton");
-    const help = document.querySelector(".helper");
-
-    play.addEventListener('click', (event) => { 
-        game();
-    });
-
-    help.addEventListener('click', (event) => {
-        alert("Rock paper scissors is an intransitive hand game, usually played between two people, in which each player simultaneously forms one of three shapes with an outstretched hand. These shapes are \"rock\" (a closed fist), \"paper\" (a flat hand), and \"scissors\" (a fist with the index finger and middle finger extended, forming a V).")
-        alert("A simultaneous, zero-sum game, it has three possible outcomes: a draw, a win or a loss. A player who decides to play rock will beat another player who has chosen scissors (rock crushes scissors or breaks scissors or sometimes blunts scissors), but will lose to one who has played paper (paper covers rock); a play of paper will lose to a play of scissors (scissors cuts paper). If both players choose the same shape, the game is tied and is usually immediately replayed to break the tie.");
-    });
+function play(sign) {
+    let res = playRound(sign, getComputerChoice());
+    let status = "\r\n\n" +`HUMAN : ${won}\tCOMPUTER : ${lost}`;  
+    if (/Congrats/.test(res) || /Sorry/i.test(res)) return res;
+    return res + status;
 }
 
+function resetGame() {
+    won = 0;
+    lost = 0;
+    result.textContent = "";
+}
+
+const help = document.querySelector(".helper");
+help.addEventListener('click', (event) => {
+    alert("Rock paper scissors is an intransitive hand game, usually played between two people, in which each player simultaneously forms one of three shapes with an outstretched hand. These shapes are \"rock\" (a closed fist), \"paper\" (a flat hand), and \"scissors\" (a fist with the index finger and middle finger extended, forming a V).")
+    alert("A simultaneous, zero-sum game, it has three possible outcomes: a draw, a win or a loss. A player who decides to play rock will beat another player who has chosen scissors (rock crushes scissors or breaks scissors or sometimes blunts scissors), but will lose to one who has played paper (paper covers rock); a play of paper will lose to a play of scissors (scissors cuts paper). If both players choose the same shape, the game is tied and is usually immediately replayed to break the tie.");
+});
+
+const rock = document.querySelector(".rock");
+const paper = document.querySelector(".paper");
+const scissors = document.querySelector(".scissors");
+
+const main = document.querySelector('.main');
+const result = document.querySelector('.result');
+result.setAttribute('style', 'white-space: pre;');
+
+rock.addEventListener('click', (event) => {
+    result.textContent = play("Rock");
+});
+
+paper.addEventListener('click', (event) => {
+    result.textContent = play("Paper");
+});
+
+scissors.addEventListener('click', (event) => {
+    result.textContent = play("Scissors");
+});
+
+const newGame = document.querySelector('.newGame');
+newGame.addEventListener('click', resetGame);
